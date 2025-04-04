@@ -7,7 +7,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
 import time  # Import time for sleep function
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 # app = Flask(__name__)
