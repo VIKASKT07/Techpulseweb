@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech News Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+        
+        .home-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .home-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .home-button svg {
+            margin-right: 6px;
+        }
+        
+        main {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+        
+        .chat-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 75vh;
+        }
+        
+        .chat-header {
+            background-color: #eef3f8;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        #chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background-color: #f5f5f5;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #e1e4e8;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        #user-input:focus {
+            border-color: #1a73e8;
+        }
+        
+        #send-button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        #send-button:hover {
+            background-color: #0d47a1;
+        }
+        
+        .side-panel {
+            flex: 1;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tech-news {
+            margin-bottom: 20px;
+        }
+        
+        .tech-news h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1a73e8;
+        }
+        
+        .news-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .news-preview {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            margin: 0 1px;
+            background-color: #bbb;
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .typing-indicator span:nth-of-type(1) {
+            animation: 1s blink infinite 0.3333s;
+        }
+        
+        .typing-indicator span:nth-of-type(2) {
+            animation: 1s blink infinite 0.6666s;
+        }
+        
+        .typing-indicator span:nth-of-type(3) {
+            animation: 1s blink infinite 0.9999s;
+        }
+        
+        @keyframes blink {
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        .chatbot-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        /* Improved formatting for bot messages with structured content */
+        .bot-message p {
+            margin-bottom: 10px;
+        }
+        
+        .bot-message h4 {
+            margin-top: 12px;
+            margin-bottom: 8px;
+            color: #1a73e8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .bot-message ul, .bot-message ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+            padding-left: 15px;
+        }
+        
+        .bot-message li {
+            margin-bottom: 6px;
+        }
+        
+        .bot-message code {
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .bot-message a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        
+        .bot-message a:hover {
+            text-decoration: underline;
+        }
+        
+        .bot-message.error-message {
+            border-left: 4px solid #ff6b6b;
+            background-color: #fff0f0;
+        }
+        
+        .topic-suggestions {
+            margin-top: 10px;
+        }
+        
+        .topic-button {
+            display: block;
+            background: #e3f2fd;
+            border: 1px solid #c1d5f5;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        .topic-button:hover {
+            background-color: #c1d5f5;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+            }
+            
+            .chat-container {
+                height: 60vh;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .home-button {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>TAI(Tech AI)</h1>
+                <p class="subtitle">Your personal guide to the latest in technology news and advancements</p>
+            </div>
+            <a href="{{ url_for('index') }}" class="home-button back-home-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                BACK TO HOME
+            </a>
+            
+        </header>
+        
+        <main>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>Chat with TAI</h2>
+                    <p class="subtitle">Ask about the latest tech news, innovations, or breakthroughs</p>
+                </div>
+                
+                <div id="chat-messages">
+                    <div class="message bot-message">
+                        Hello! I'm TAI. I'm here to discuss tech news, innovations, and advancements with you. What tech topic would you like to explore today?
+                        <div class="message-time">Just now</div>
+                    </div>
+                    
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" id="user-input" placeholder="Ask about tech news and innovations...">
+                    <button id="send-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- <div class="side-panel">
+                <div class="tech-news">
+                    <h3>Tech Topics to Explore</h3>
+                    
+                    <div class="news-item">
+                        <div class="news-title">AI & Machine Learning</div>
+                        <div class="news-preview">Latest advancements in artificial intelligence, machine learning models, and neural networks</div>
+                    </div>
+                    
+                    <div class="news-item">
+                        <div class="news-title">Quantum Computing</div>
+                        <div class="news-preview">Breakthroughs in quantum processors, algorithms, and real-world applications</div>
+                    </div>
+                    
+                    <div class="news-item">
+                        <div class="news-title">Renewable Energy Tech</div>
+                        <div class="news-preview">Innovations in solar, wind, and other sustainable energy technologies</div>
+                    </div>
+                    
+                    <div class="news-item">
+                        <div class="news-title">Biotechnology</div>
+                        <div class="news-preview">Advancements in genetic engineering, medical technology, and bioinformatics</div>
+                    </div>
+                </div>
+                
+                <div class="chatbot-info">
+                    <p><strong>About TechTalk AI:</strong> This chatbot is powered by Google's Gemini LLM and is designed to discuss technical topics, recent advancements, and news in the technology sector.</p>
+                </div>
+            </div> -->
+        </main>
+        
+        <footer>
+            TechTalk AI Assistant © 2025 | Powered by Gemini AI
+        </footer>
+    </div>
+
+    <script>
+        // API Key (typically this would be secured on a backend)
+        const API_KEY = 'AIzaSyBIJ_btl_Qzp1M1f5qZu_iXebDgOtH0tw0';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        
+        // DOM Elements
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.querySelector('.typing-indicator');
+        
+        // Technology topics for filtering
+        const techTopics = [
+            "ai", "artificial intelligence", "machine learning", "deep learning", "neural networks",
+            "quantum", "computing", "algorithm", "data science", "big data", "analytics",
+            "blockchain", "cryptocurrency", "bitcoin", "ethereum", "web3",
+            "cybersecurity", "security", "encryption", "cloud", "devops",
+            "internet of things", "iot", "robotics", "automation", "augmented reality", "virtual reality",
+            "ar", "vr", "xr", "metaverse", "programming", "software", "development", "coding",
+            "hardware", "chip", "semiconductor", "processor", "gpu", "cpu",
+            "mobile", "5g", "6g", "network", "telecom", "telecommunications",
+            "solar", "renewable", "energy", "battery", "electric vehicle", "ev",
+            "biotech", "biotechnology", "crispr", "genetic", "medicine", "healthcare tech",
+            "space", "aerospace", "satellite", "rockets", "drone", "tech startup",
+            "innovation", "gadget", "smartphone", "laptop", "tablet", "wearable",
+            "open source", "linux", "windows", "macos", "ios", "android",
+            "app", "application", "web development", "frontend", "backend",
+            "database", "sql", "nosql", "ui", "ux", "design", "tech industry", "tech company" ,"nvidia", "tesla",
+            "microsoft", "automobiles", "electronics", "optics", "microprocessors", "microcontrollers", "intel", "apple", "samsung",
+            "dell", "HP", "google", "TATA", "technical news", "latest", "founder", "news", "updates", "trends", "research", "development", "innovation", "breakthroughs",
+            "today", "tech news" 
+         
+        ];
+        
+        // Event Listeners
+        sendButton.addEventListener('click', handleUserMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserMessage();
+            }
+        });
+        
+        // Check if the message is technology related
+        function isTechRelated(message) {
+            const lowerMessage = message.toLowerCase();
+            return techTopics.some(topic => lowerMessage.includes(topic));
+        }
+        
+        // Handle user message
+        function handleUserMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            
+            // Check if message is technology related
+            if (!isTechRelated(message)) {
+                // Message is not tech related, provide a reminder
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    
+                    const reminderMessage = `I'm specifically designed to discuss technology topics only. Could you please ask me about tech-related subjects like AI, quantum computing, renewable energy technology, or cybersecurity?`;
+                    
+                    // Add suggested topics after the reminder
+                    addNonTechResponse(reminderMessage);
+                }, 1000);
+            } else {
+                // Message is tech related, proceed with API call
+                // Format prompt to focus on tech topics with clear formatting instruction
+                const techPrompt = `As a tech-focused assistant, please provide information about "${message}". 
+                Focus only on technical aspects, recent advancements, industry news, or innovations related to this topic.
+                
+                Format your response in HTML with clear structure:
+                1. Use <h4> tags for section headings (e.g. "<h4>Key Developments</h4>")
+                2. Use <p> tags for paragraphs
+                3. Use <ul> and <li> tags for bullet lists
+                4. Use <ol> and <li> tags for numbered lists
+                5. Keep paragraphs concise and focused
+                
+                IMPORTANT: Organize the response with clear headings and properly formatted lists.
+                If the query is not related to technology, politely redirect the conversation to tech topics.`;
+                
+                // Call API
+                fetchAIResponse(techPrompt);
+            }
+        }
+        
+        // Add a non-tech response with suggested topics
+        function addNonTechResponse(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot-message');
+            
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            
+            // Add suggested topics
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.classList.add('topic-suggestions');
+            
+            const suggestedTopics = [
+                "What are the latest advancements in AI?",
+                "Tell me about quantum computing breakthroughs",
+                "How is blockchain technology evolving?",
+                "Recent developments in cybersecurity"
+            ];
+            
+            suggestionsDiv.innerHTML = '<p>Here are some tech topics you might be interested in:</p>';
+            
+            suggestedTopics.forEach(topic => {
+                const topicButton = document.createElement('button');
+                topicButton.textContent = topic;
+                topicButton.classList.add('topic-button');
+                
+                topicButton.addEventListener('click', () => {
+                    userInput.value = topic;
+                    handleUserMessage();
+                });
+                
+                suggestionsDiv.appendChild(topicButton);
+            });
+            
+            messageDiv.appendChild(suggestionsDiv);
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('message-time');
+            timeDiv.textContent = 'Just now';
+            
+            messageDiv.appendChild(timeDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            
+            if (sender === 'user') {
+                messageDiv.textContent = text;
+            } else {
+                // For bot messages, we'll parse the HTML response
+                messageDiv.innerHTML = text;
+                
+                // Then, create a code section to show the HTML source
+                const codeSection = document.createElement('div');
+                codeSection.classList.add('html-source');
+                
+                // Style for the code section
+                codeSection.style.marginTop = '10px';
+                codeSection.style.padding = '8px';
+                codeSection.style.backgroundColor = '#f0f0f0';
+                codeSection.style.borderRadius = '6px';
+                codeSection.style.fontSize = '12px';
+                codeSection.style.overflow = 'auto';
+                codeSection.style.maxHeight = '150px';
+                
+                // Add a toggle button
+                const toggleButton = document.createElement('button');
+                toggleButton.textContent = 'Show HTML';
+                toggleButton.style.fontSize = '11px';
+                toggleButton.style.padding = '2px 5px';
+                toggleButton.style.marginTop = '5px';
+                toggleButton.style.border = '1px solid #ddd';
+                toggleButton.style.borderRadius = '4px';
+                toggleButton.style.backgroundColor = '#f8f8f8';
+
+                // Hide code section initially
+                codeSection.style.display = 'none';
+
+                toggleButton.onclick = function() {
+                    if (codeSection.style.display === 'none') {
+                        codeSection.style.display = 'block';
+                        toggleButton.textContent = 'Hide HTML';
+                    } else {
+                        codeSection.style.display = 'none';
+                        toggleButton.textContent = 'Show HTML';
+                    }
+                };
+                
+                // Show the HTML code with special characters escaped
+                const codeDisplay = document.createElement('pre');
+                codeDisplay.textContent = text;
+                codeSection.appendChild(codeDisplay);
+                
+                messageDiv.appendChild(toggleButton);
+                messageDiv.appendChild(codeSection);
+            }
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('message-time');
+            timeDiv.textContent = 'Just now';
+            
+            messageDiv.appendChild(timeDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Parse and format API response
+        function parseAndFormatResponse(response) {
+            // First check if there's already HTML structure in the response
+            if (response.includes('<h4>') || response.includes('<ul>') || response.includes('<ol>')) {
+                // Response already has HTML structure, but sanitize it
+                const sanitized = response
+                    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+                
+                return sanitized;
+            }
+            
+            // Otherwise, we need to parse and format the text
+            let formatted = '';
+            
+            // Split by potential headings (lines ending with : or starting with ## or #)
+            const sections = response.split(/\n(?=##?\s|[^#].*:$)/g);
+            
+            sections.forEach(section => {
+                // Process each section
+                section = section.trim();
+                
+                // Skip empty sections
+                if (!section) return;
+                
+                // Check if this is a heading
+                if (section.startsWith('##') || section.match(/^[^#].*:$/)) {
+                    // This is a heading - extract the heading text
+                    const headingText = section.replace(/^##?\s+/, '').replace(/:$/, '');
+                    formatted += `<h4>${headingText}</h4>`;
+                    
+                    // Remove the heading from the section for further processing
+                    section = section.replace(/^##?\s+[^\n]+\n?/, '').replace(/^[^#].*:$\n?/, '');
+                }
+                
+                // Process the content of the section
+                if (section) {
+                    // Split the section into paragraphs
+                    const paragraphs = section.split(/\n\n+/);
+                    
+                    paragraphs.forEach(paragraph => {
+                        paragraph = paragraph.trim();
+                        if (!paragraph) return;
+                        
+                        // Check if this is a list
+                        if (paragraph.includes('\n- ') || paragraph.includes('\n* ')) {
+                            // This is a bullet list
+                            const listItems = paragraph.split(/\n[*-]\s+/);
+                            
+                            // The first item might be a paragraph preceding the list
+                            const firstItem = listItems.shift();
+                            if (firstItem && !firstItem.match(/^[*-]\s+/)) {
+                                formatted += `<p>${firstItem}</p>`;
+                            } else if (firstItem) {
+                                // First item is actually a list item that didn't have a newline before it
+                                formatted += '<ul>';
+                                formatted += `<li>${firstItem.replace(/^[*-]\s+/, '')}</li>`;
+                                
+                                listItems.forEach(item => {
+                                    if (item.trim()) {
+                                        formatted += `<li>${item}</li>`;
+                                    }
+                                });
+                                
+                                formatted += '</ul>';
+                            }
+                            
+                            // Add remaining list items
+                            if (listItems.length > 0) {
+                                formatted += '<ul>';
+                                listItems.forEach(item => {
+                                    if (item.trim()) {
+                                        formatted += `<li>${item}</li>`;
+                                    }
+                                });
+                                formatted += '</ul>';
+                            }
+                        } 
+                        // Check for numbered lists
+                        else if (paragraph.match(/\n\d+\.\s/)) {
+                            // This is a numbered list
+                            const listItems = paragraph.split(/\n\d+\.\s+/);
+                            
+                            // The first item might be a paragraph preceding the list
+                            const firstItem = listItems.shift();
+                            if (firstItem && !firstItem.match(/^\d+\.\s+/)) {
+                                formatted += `<p>${firstItem}</p>`;
+                            } else if (firstItem) {
+                                // First item is actually a list item
+                                formatted += '<ol>';
+                                formatted += `<li>${firstItem.replace(/^\d+\.\s+/, '')}</li>`;
+                                
+                                listItems.forEach(item => {
+                                    if (item.trim()) {
+                                        formatted += `<li>${item}</li>`;
+                                    }
+                                });
+                                
+                                formatted += '</ol>';
+                            }
+                            
+                            // Add remaining list items
+                            if (listItems.length > 0) {
+                                formatted += '<ol>';
+                                listItems.forEach(item => {
+                                    if (item.trim()) {
+                                        formatted += `<li>${item}</li>`;
+                                    }
+                                });
+                                formatted += '</ol>';
+                            }
+                        } 
+                        // Otherwise, it's a regular paragraph
+                        else {
+                            formatted += `<p>${paragraph}</p>`;
+                        }
+                    });
+                }
+            });
+            
+            // Replace markdown-style code with HTML code tags
+            formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            return formatted;
+        }
+        
+        // Fetch response from Gemini API
+        async function fetchAIResponse(prompt) {
+            try {
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    let aiResponse = data.candidates[0].content.parts[0].text;
+                    
+                    // Format response with improved parser
+                    const formattedResponse = parseAndFormatResponse(aiResponse);
+                    
+                    addMessage(formattedResponse, 'bot');
+                } else {
+                    addMessage("<p>I'm having trouble connecting to the tech news servers. Please try again later.</p>", 'bot');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.style.display = 'none';
+                addMessage("<p>I'm having trouble connecting right now. Please check your internet connection and try again.</p>", 'bot');
+            }
+        }
+        
+        // Initial load - suggest topics
+        window.addEventListener('load', () => {
+            // Pre-load some suggested tech topics
+            const suggestedTopics = [
+                "What are the latest advancements in AI?",
+                "Tell me about quantum computing breakthroughs",
+                "What's new in renewable energy technology?",
+                "Recent developments in cybersecurity"
+            ];
+            
+            // Make these clickable
+            setTimeout(() => {
+                addMessage("<p>Here are some tech topics you might be interested in discussing:</p>", 'bot');
+                
+                const suggestionsDiv = document.createElement('div');
+                suggestionsDiv.classList.add('message', 'bot-message');
+                
+                suggestedTopics.forEach(topic => {
+                    const topicButton = document.createElement('button');
+                    topicButton.textContent = topic;
+                    topicButton.classList.add('topic-button');
+                    
+                    topicButton.addEventListener('click', () => {
+                        userInput.value = topic;
+                        handleUserMessage();
+                    });
+                    
+                    suggestionsDiv.appendChild(topicButton);
+                });
+                
+                chatMessages.appendChild(suggestionsDiv);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
