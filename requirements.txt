@@ -3,7 +3,5 @@ Flask
 Flask-SQLAlchemy
 Flask-Bcrypt
 Flask-CORS
-
-email
 gunicorn
 Werkzeug
