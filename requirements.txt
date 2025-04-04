@@ -1,3 +1,8 @@
+psycopg2
+psycopg2-binary
+flask
+gunicorn
+psycopg2-binary  # Use this instead of psycopg2
 blis==1.2.0
 aiohttp==3.9.5
 aiohttp-retry==2.8.3
